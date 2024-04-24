@@ -1,7 +1,8 @@
 const Arquivo = require("../models/tb_arquivo");
-const path = require('path');
+const path = require("path");
 const fs = require("fs").promises;
 const nodemailer = require("nodemailer");
+require("dotenv").config();
 
 const arquivoController = {
   // GET: Listar todos os arquivos
@@ -66,23 +67,23 @@ const arquivoController = {
       });
 
       const htmlFilePath = path.join(
-        __dirname, "../template/boasvindas/index.html"
+        __dirname,
+        "../template/boasvindas/index.html"
       );
       let htmlContent = await fs.readFile(htmlFilePath, "utf8");
 
-
-      let transporter = nodemailer.createTransport({
+      const transporter = nodemailer.createTransport({
         host: process.env.EMAIL_HOST,
         port: process.env.EMAIL_PORT,
         secure: true,
         auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
         },
         tls: {
-          ciphers: "TLSv1",
+            ciphers: "TLSv1",
         },
-      });
+    });
 
       let mailOptions = {
         from: `"Atendimento Flow" ${process.env.EMAIL_FROM}`,
@@ -92,12 +93,11 @@ const arquivoController = {
       };
 
       await transporter.sendMail(mailOptions);
-      console.log("Email enviado com sucesso para ======> support@myflowcommunity.com, vinicio.givr@gmail.com");
+      console.log(
+        "Email enviado com sucesso para ======> support@myflowcommunity.com, vinicio.givr@gmail.com"
+      );
 
-      const response = {
-        mensagem: "Documento(s) cadastrado(s) com sucesso e email enviado!",
-        documentosCadastrados: documentos,
-      };
+    
 
       res.status(201).json(novoArquivo);
     } catch (error) {
