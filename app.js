@@ -13,6 +13,7 @@ const rotaUsuarios = require("./routes/usuario");
 const rotaEnvios = require("./routes/envio");
 const rotaArquivo = require("./routes/arquivos");
 
+
 require("dotenv").config();
 
 const Code = require("./models/tb_code");
@@ -68,6 +69,7 @@ app.use("/status", rotaStatus);
 app.use("/usuarios", rotaUsuarios);
 app.use("/email", rotaEnvios);
 app.use("/arquivo", rotaArquivo);
+
 
 app.get("/api/test", (req, res) => {
   res.status(200).json({ message: "OK" });

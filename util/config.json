@@ -1,0 +1,22 @@
+[
+    {
+        "id": "1",
+        "nome_arquivo": "EA Flow.mq4",
+        "data_hora_compilado": "2024.04.15 18:24:44",
+        "alert_data_hora_compilado": "off",
+        "atualizar": "off",
+        "versao": "1.4",
+        "link_atualizar": "https:\/\/drive.google.com\/drive\/folders\/1vpeU8WqaCU9jsTZ801Mo78hbuxG5M7qE?usp=sharing",
+        "msg_atualizar": "Faca o upgrade para a versao 1.4!"
+    },
+    {
+        "id": "2",
+        "nome_arquivo": "teste.mq4",
+        "data_hora_compilado": "2023.05.25 03:40:40",
+        "alert_data_hora_compilado": "off",
+        "atualizar": "off",
+        "versao": "1",
+        "link_atualizar": "https:\/\/www.youtube.com",
+        "msg_atualizar": "teste!"
+    }
+]

@@ -97,7 +97,7 @@ const arquivoController = {
         "Email enviado com sucesso para ======> support@myflowcommunity.com, vinicio.givr@gmail.com"
       );
 
-    
+      console.log(req.body);  
 
       res.status(201).json(novoArquivo);
     } catch (error) {
