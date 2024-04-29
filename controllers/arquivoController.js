@@ -1,174 +1,93 @@
-const Arquivo = require("../models/tb_arquivo");
-const path = require("path");
-const fs = require("fs").promises;
-const nodemailer = require("nodemailer");
-require("dotenv").config();
+const express = require('express');
+const fs = require('fs').promises; 
+const path = require('path');
 
-const arquivoController = {
-  // GET: Listar todos os arquivos
-  listarTodos: async (req, res) => {
-    try {
-      const arquivos = await Arquivo.findAll();
-      res.status(200).json(arquivos);
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Erro ao buscar os arquivos", error: error.message });
-    }
-  },
+const USERS_FILE = path.join(__dirname, 'public', 'users.json');
 
-  // GET: Buscar um arquivo específico por ID
-  obterArquivo: async (req, res) => {
-    try {
-      const { id } = req.params;
-      const arquivo = await Arquivo.findByPk(id);
-      if (arquivo) {
-        res.status(200).json(arquivo);
-      } else {
-        res.status(404).json({ message: "Arquivo não encontrado" });
-      }
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Erro ao buscar o arquivo", error: error.message });
-    }
-  },
-
-  // POST: Criar um novo arquivo
-  criarArquivo: async (req, res) => {
-    try {
-      const {
-        ativar_ip,
-        ip,
-        status,
-        cid,
-        mtid,
-        ativar_nome_usuario,
-        nome_usuario,
-        ativar_expiracao,
-        expiracao,
-        ativar_tipo_conta,
-        tipo_conta,
-        page,
-      } = req.body;
-      const novoArquivo = await Arquivo.create({
-        ativar_ip,
-        ip,
-        status,
-        cid,
-        mtid,
-        ativar_nome_usuario,
-        nome_usuario,
-        ativar_expiracao,
-        expiracao,
-        ativar_tipo_conta,
-        tipo_conta,
-        page,
-      });
-
-      const htmlFilePath = path.join(
-        __dirname,
-        "../template/boasvindas/index.html"
-      );
-      let htmlContent = await fs.readFile(htmlFilePath, "utf8");
-
-      const transporter = nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
-        port: process.env.EMAIL_PORT,
-        secure: true,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
-        tls: {
-            ciphers: "TLSv1",
-        },
-    });
-
-      let mailOptions = {
-        from: `"Atendimento Flow" ${process.env.EMAIL_FROM}`,
-        to: "support@myflowcommunity.com, vinicio.givr@gmail.com",
-        subject: "🚀 Um novo pedido na área",
-        html: htmlContent,
-      };
-
-      await transporter.sendMail(mailOptions);
-      console.log(
-        "Email enviado com sucesso para ======> support@myflowcommunity.com, vinicio.givr@gmail.com"
-      );
-
-      console.log(req.body);  
-
-      res.status(201).json(novoArquivo);
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Erro ao criar o arquivo", error: error.message });
-    }
-  },
-
-  // PUT: Atualizar um arquivo existente
-  atualizarArquivo: async (req, res) => {
-    try {
-      const { id } = req.params;
-      const {
-        ativar_ip,
-        ip,
-        status,
-        cid,
-        mtid,
-        ativar_nome_usuario,
-        nome_usuario,
-        ativar_expiracao,
-        expiracao,
-        ativar_tipo_conta,
-        tipo_conta,
-        page,
-      } = req.body;
-      const arquivo = await Arquivo.findByPk(id);
-      if (arquivo) {
-        await arquivo.update({
-          ativar_ip,
-          ip,
-          status,
-          cid,
-          mtid,
-          ativar_nome_usuario,
-          nome_usuario,
-          ativar_expiracao,
-          expiracao,
-          ativar_tipo_conta,
-          tipo_conta,
-          page,
-        });
-        res.status(200).json({ message: "Arquivo atualizado com sucesso" });
-      } else {
-        res.status(404).json({ message: "Arquivo não encontrado" });
-      }
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Erro ao atualizar o arquivo", error: error.message });
-    }
-  },
-
-  // DELETE: Deletar um arquivo
-  deletarArquivo: async (req, res) => {
-    try {
-      const { id } = req.params;
-      const arquivo = await Arquivo.findByPk(id);
-      if (arquivo) {
-        await arquivo.destroy();
-        res.status(200).json({ message: "Arquivo deletado com sucesso" });
-      } else {
-        res.status(404).json({ message: "Arquivo não encontrado" });
-      }
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Erro ao deletar o arquivo", error: error.message });
-    }
-  },
+const getUsers = async (req, res, next) => {
+  try {
+    const data = await fs.readFile(USERS_FILE, 'utf8');
+    const users = JSON.parse(data);
+    return res.status(200).send({ response: users });
+  } catch (error) {
+    return res.status(500).send({ error: error.message });
+  }
 };
 
-module.exports = arquivoController;
+const getUserById = async (req, res, next) => {
+  try {
+    const data = await fs.readFile(USERS_FILE, 'utf8');
+    const users = JSON.parse(data);
+    const user = users.find(u => u.mtid === req.params.mtid); 
+    if (user) {
+      return res.status(200).send({ response: user });
+    } else {
+      return res.status(404).send({ message: 'Usuário não encontrado' });
+    }
+  } catch (error) {
+    return res.status(500).send({ error: error.message });
+  }
+};
+
+const createUser = async (req, res, next) => {
+  try {
+    const newUser = req.body;
+    const data = await fs.readFile(USERS_FILE, 'utf8');
+    const users = JSON.parse(data);
+    users.push(newUser);
+    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
+    return res.status(201).send({ response: newUser });
+  } catch (error) {
+    return res.status(500).send({ error: error.message });
+  }
+};
+
+const updateUser = async (req, res, next) => {
+  try {
+    const mtid = req.params.mtid;
+    const data = await fs.readFile(USERS_FILE, 'utf8');
+    let users = JSON.parse(data);
+    let updated = false;
+    users = users.map(user => {
+      if (user.mtid === mtid) {
+        updated = true;
+        return { ...user, ...req.body };
+      }
+      return user;
+    });
+    if (updated) {
+      await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
+      return res.status(200).send({ message: 'Usuário atualizado com sucesso' });
+    } else {
+      return res.status(404).send({ message: 'Usuário não encontrado' });
+    }
+  } catch (error) {
+    return res.status(500).send({ error: error.message });
+  }
+};
+
+const deleteUser = async (req, res, next) => {
+  try {
+    const mtid = req.params.mtid;
+    const data = await fs.readFile(USERS_FILE, 'utf8');
+    let users = JSON.parse(data);
+    const initialLength = users.length;
+    users = users.filter(user => user.mtid !== mtid);
+    if (users.length !== initialLength) {
+      await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
+      return res.status(200).send({ message: 'Usuário deletado com sucesso' });
+    } else {
+      return res.status(404).send({ message: 'Usuário não encontrado' });
+    }
+  } catch (error) {
+    return res.status(500).send({ error: error.message });
+  }
+};
+
+module.exports = {
+  getUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  deleteUser
+};

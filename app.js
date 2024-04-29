@@ -68,7 +68,7 @@ app.use("/recovery", rotaRecovery);
 app.use("/status", rotaStatus);
 app.use("/usuarios", rotaUsuarios);
 app.use("/email", rotaEnvios);
-app.use("/arquivo", rotaArquivo);
+app.use("/file", rotaArquivo);
 
 
 app.get("/api/test", (req, res) => {
