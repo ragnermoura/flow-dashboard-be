@@ -62,36 +62,6 @@ const verifyAndUpdateUser = async (req, res, next) => {
     
     let users = JSON.parse(data);
 
-    // Verificando se o usuário já existe pelo mtid
-    let existingUser = users.find((u) => u.mtid === userData.mtid);
-
-    // Atualizando ou criando um novo usuário
-    if (existingUser) {
-      // Atualizando um usuário existente
-      console.log("Usuário existente encontrado:", existingUser);
-      existingUser = {
-        ...existingUser,
-        ...userData,
-        status: "ATIVADO",
-        ip: req.ip,
-      };
-    } else {
-      // Criando um novo usuário
-      console.log("Nenhum usuário existente encontrado. Criando novo usuário...");
-      const newUser = {
-        ...userData,
-        status: "PENDENTE",
-        ativar_ip: "off",
-        ativar_nome_usuario: "off",
-        ativar_expiracao: "off",
-        expiracao: "",
-        ativar_tipo_conta: "off",
-        tipo_conta: "DEMO",
-        ip: req.ip,
-      };
-      users.push(newUser);
-    }
-
     // Escrevendo os dados atualizados no arquivo users.json
     await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
     console.log("Usuário atualizado com sucesso:", existingUser || newUser);
