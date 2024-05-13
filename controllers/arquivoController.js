@@ -75,7 +75,6 @@ const verifyAndUpdateUser = async (req, res, next) => {
         status: "ATIVADO",
         ip: req.ip,
       };
-      users = users.map((u) => (u.mtid === userData.mtid ? existingUser : u));
     } else {
       // Criando um novo usuário
       console.log("Nenhum usuário existente encontrado. Criando novo usuário...");
@@ -106,6 +105,7 @@ const verifyAndUpdateUser = async (req, res, next) => {
     return res.status(500).send({ error: error.message });
   }
 };
+
 
 
 const updateUser = async (req, res, next) => {
