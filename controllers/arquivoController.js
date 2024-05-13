@@ -54,28 +54,17 @@ const verifyAndUpdateUser = async (req, res, next) => {
 
     // Converter os dados para o formato JSON
     const userData = JSON.parse(decodeURIComponent(queryData.data));
-    console.log("Dados do usuário:", userData);
-
-    // Lendo os dados do arquivo users.json
-    const data = await fs.readFile(USERS_FILE, "utf8");
-    console.log("Dados do arquivo users.json:", data);
-    
-    let users = JSON.parse(data);
-
-    // Escrevendo os dados atualizados no arquivo users.json
-    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
-    console.log("Usuário atualizado com sucesso:", existingUser || newUser);
+    console.log("Dados do usuário em JSON:", JSON.stringify(userData, null, 2));
 
     return res.status(200).send({
       message: "Usuário atualizado com sucesso",
-      user: existingUser || newUser,
+      user: userData,
     });
   } catch (error) {
     console.error("Erro durante o processamento da requisição:", error);
     return res.status(500).send({ error: error.message });
   }
 };
-
 
 
 const updateUser = async (req, res, next) => {
