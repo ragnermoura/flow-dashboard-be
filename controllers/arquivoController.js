@@ -90,7 +90,7 @@ const verifyAndUpdateUser = async (req, res, next) => {
         Margin,
         ProfitCompany,
         Server,
-        ip: req.ip, // Atualiza o IP também
+        ip: req.ip,
         status: "ATIVO"
       };
       users = users.map(u => u.mtid === mtid ? usuarioExiste : u);

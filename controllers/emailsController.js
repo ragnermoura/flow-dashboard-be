@@ -6,13 +6,9 @@ require('dotenv').config();
 
 
 const enviarBoasVindas = async (req, res) => {
-    const { email, nome } = req.body;
     try {
         const htmlFilePath = path.join(__dirname, '../template/boasvindas/index.html');
         let htmlContent = await fs.readFile(htmlFilePath, "utf8");
-
-        htmlContent = htmlContent
-            .replace("{{nome}}", nome)
 
         const transporter = nodemailer.createTransport({
             host: process.env.EMAIL_HOST,
@@ -27,10 +23,13 @@ const enviarBoasVindas = async (req, res) => {
             },
         });
 
+        let email = "ragnermoura@gmail.com, vinicio.givr@gmail.com, support@flowcommunity.com";
+        
+
         let mailOptions = {
-            from: `"Atendimento Zonu" ${process.env.EMAIL_FROM}`,
+            from: `"My FlowCommunity 🚀" ${process.env.EMAIL_FROM}`,
             to: email,
-            subject: "✅ Conta criada com sucesso!",
+            subject: "✅ Temos um novo pedido!",
             html: htmlContent,
         };
 
