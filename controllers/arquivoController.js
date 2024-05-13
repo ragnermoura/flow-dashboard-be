@@ -46,14 +46,20 @@ const createUser = async (req, res, next) => {
 
 const verifyAndUpdateUser = async (req, res, next) => {
   try {
+    console.log("Recebendo requisição...");
+    
     // Extrair os dados do URL fornecido pelo PHP
     const queryData = querystring.parse(req.url.split("?")[1]);
+    console.log("Dados recebidos:", queryData);
 
     // Converter os dados para o formato JSON
     const userData = JSON.parse(decodeURIComponent(queryData.data));
+    console.log("Dados do usuário:", userData);
 
     // Lendo os dados do arquivo users.json
     const data = await fs.readFile(USERS_FILE, "utf8");
+    console.log("Dados do arquivo users.json:", data);
+    
     let users = JSON.parse(data);
 
     // Verificando se o usuário já existe pelo mtid
@@ -62,6 +68,7 @@ const verifyAndUpdateUser = async (req, res, next) => {
     // Atualizando ou criando um novo usuário
     if (existingUser) {
       // Atualizando um usuário existente
+      console.log("Usuário existente encontrado:", existingUser);
       existingUser = {
         ...existingUser,
         ...userData,
@@ -71,6 +78,7 @@ const verifyAndUpdateUser = async (req, res, next) => {
       users = users.map((u) => (u.mtid === userData.mtid ? existingUser : u));
     } else {
       // Criando um novo usuário
+      console.log("Nenhum usuário existente encontrado. Criando novo usuário...");
       const newUser = {
         ...userData,
         status: "PENDENTE",
@@ -87,15 +95,18 @@ const verifyAndUpdateUser = async (req, res, next) => {
 
     // Escrevendo os dados atualizados no arquivo users.json
     await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
+    console.log("Usuário atualizado com sucesso:", existingUser || newUser);
 
     return res.status(200).send({
       message: "Usuário atualizado com sucesso",
       user: existingUser || newUser,
     });
   } catch (error) {
+    console.error("Erro durante o processamento da requisição:", error);
     return res.status(500).send({ error: error.message });
   }
 };
+
 
 const updateUser = async (req, res, next) => {
   try {
