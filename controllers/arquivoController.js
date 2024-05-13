@@ -60,7 +60,7 @@ const verifyAndUpdateUser = async (req, res, next) => {
       Margin,
       ProfitCompany,
       Server,
-    } = req.query;
+    } = req.body; // Agora estamos acessando req.body em vez de req.query
 
     // Verificação específica para retorno do IP, como no código PHP
     if (page === "IP") {
