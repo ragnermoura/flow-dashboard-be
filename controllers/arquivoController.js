@@ -4,7 +4,7 @@ const path = require("path");
 const Arquivo = require("../models/tb_acesso");
 const querystring = require("querystring");
 
-const USERS_FILE = path.join(__dirname, "public", "users.json");
+const USERS_FILE = path.join(__dirname, "..", "public", "users.json");
 
 const getUsers = async (req, res, next) => {
   try {
