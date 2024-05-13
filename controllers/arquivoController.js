@@ -2,6 +2,7 @@ const express = require("express");
 const fs = require("fs").promises;
 const path = require("path");
 const Arquivo = require("../models/tb_acesso");
+const querystring = require("querystring");
 
 const USERS_FILE = path.join(__dirname, "public", "users.json");
 
@@ -45,87 +46,52 @@ const createUser = async (req, res, next) => {
 
 const verifyAndUpdateUser = async (req, res, next) => {
   try {
-    const {
-      page,
-      mtid,
-      cid,
-      nome_usuario,
-      Company,
-      Balance,
-      Credit,
-      Currency,
-      Equity,
-      FreeMargin,
-      Leverage,
-      Margin,
-      ProfitCompany,
-      Server,
-    } = req.body; // Agora estamos acessando req.body em vez de req.query
+    // Extrair os dados do URL fornecido pelo PHP
+    const queryData = querystring.parse(req.url.split("?")[1]);
 
-    // Verificação específica para retorno do IP, como no código PHP
-    if (page === "IP") {
-      return res.send({ ip: req.ip });
-    }
+    // Converter os dados para o formato JSON
+    const userData = JSON.parse(decodeURIComponent(queryData.data));
 
+    // Lendo os dados do arquivo users.json
     const data = await fs.readFile(USERS_FILE, "utf8");
     let users = JSON.parse(data);
 
-    let usuarioExiste = users.find((u) => u.mtid === mtid);
+    // Verificando se o usuário já existe pelo mtid
+    let existingUser = users.find((u) => u.mtid === userData.mtid);
 
-    if (usuarioExiste) {
+    // Atualizando ou criando um novo usuário
+    if (existingUser) {
       // Atualizando um usuário existente
-      usuarioExiste = {
-        ...usuarioExiste,
-        page,
-        mtid,
-        cid,
-        nome_usuario,
-        Company,
-        Balance,
-        Credit,
-        Currency,
-        Equity,
-        FreeMargin,
-        Leverage,
-        Margin,
-        ProfitCompany,
-        Server,
+      existingUser = {
+        ...existingUser,
+        ...userData,
+        status: "ATIVADO",
         ip: req.ip,
-        status: "ATIVO"
       };
-      users = users.map(u => u.mtid === mtid ? usuarioExiste : u);
+      users = users.map((u) => (u.mtid === userData.mtid ? existingUser : u));
     } else {
       // Criando um novo usuário
       const newUser = {
-        page,
-        mtid,
-        cid,
-        nome_usuario,
-        Company,
-        Balance,
-        Credit,
-        Currency,
-        Equity,
-        FreeMargin,
-        Leverage,
-        Margin,
-        ProfitCompany,
-        Server,
-        ip: req.ip,
+        ...userData,
         status: "PENDENTE",
-        ativar_ip: "false",
-        ativar_nome_usuario: "false",
-        ativar_expiracao: "false",
-        expiracao: "00.00.0000 00:00:00",
-        ativar_tipo_conta: "false",
+        ativar_ip: "off",
+        ativar_nome_usuario: "off",
+        ativar_expiracao: "off",
+        expiracao: "",
+        ativar_tipo_conta: "off",
         tipo_conta: "DEMO",
+        ip: req.ip,
       };
       users.push(newUser);
     }
 
+    // Escrevendo os dados atualizados no arquivo users.json
     await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
-    return res.status(200).send({ message: "Usuário atualizado com sucesso", user: usuarioExiste || newUser });
 
+    return res.status(200).send({
+      message: "Usuário atualizado com sucesso",
+      user: existingUser || newUser,
+    });
   } catch (error) {
     return res.status(500).send({ error: error.message });
   }
