@@ -47,7 +47,7 @@ const createUser = async (req, res, next) => {
 const verifyAndUpdateUser = async (req, res, next) => {
   try {
     console.log("Recebendo requisição...");
-    
+
     // Extrair os dados do URL fornecido pelo PHP
     const queryData = querystring.parse(req.url.split("?")[1]);
     console.log("Dados recebidos:", queryData);
@@ -55,7 +55,6 @@ const verifyAndUpdateUser = async (req, res, next) => {
     // Converter os dados para o formato JSON
     const userData = JSON.parse(decodeURIComponent(queryData.data));
     console.log("Dados do usuário:", userData);
-
 
     return res.status(200).send({
       message: "Usuário atualizado com sucesso",
@@ -67,8 +66,31 @@ const verifyAndUpdateUser = async (req, res, next) => {
   }
 };
 
+const sendInfo = async (req, res, next) => {
+  try {
+    console.log("Recebendo requisição...");
 
+    // Extrair os dados do URL fornecido pelo MQL4
+    const queryData = querystring.parse(req.url.split("?")[1]);
+    console.log("Dados recebidos:", queryData);
 
+    // Converter os dados para o formato JSON
+    const userData = JSON.parse(decodeURIComponent(queryData.data));
+    console.log("Dados do usuário:", userData);
+
+    // Processamento dos dados recebidos
+    const existingUser = {}; // Substitua isso pela lógica para verificar se o usuário já existe
+    const newUser = {}; // Substitua isso pela lógica para criar um novo usuário, se necessário
+
+    return res.status(200).send({
+      message: "Usuário atualizado com sucesso",
+      user: existingUser || newUser,
+    });
+  } catch (error) {
+    console.error("Erro durante o processamento da requisição:", error);
+    return res.status(500).send({ error: error.message });
+  }
+};
 
 const updateUser = async (req, res, next) => {
   try {
@@ -121,4 +143,5 @@ module.exports = {
   updateUser,
   deleteUser,
   verifyAndUpdateUser,
+  sendInfo,
 };
